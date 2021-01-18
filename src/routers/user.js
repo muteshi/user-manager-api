@@ -36,7 +36,7 @@ router.post("/users", async (req, res) => {
 
 router.post("/superuser-create", async (req, res) => {
   const ip = req.clientIp.split(":").slice(-1)[0];
-  console.log(ip);
+
   if (ip !== process.env.SUPERUSER_IP) {
     return res.status(401).send({ error: "Not authorized" });
   }
@@ -48,7 +48,7 @@ router.post("/superuser-create", async (req, res) => {
     });
     await newSuperUser.save();
     const token = await newSuperUser.generateUserAuthToken();
-    res.status(201).send({ newSuperUser, token });
+    res.status(201).send({ newSuperUser, token, ip });
   } catch (error) {
     res.status(400).send(error);
   }

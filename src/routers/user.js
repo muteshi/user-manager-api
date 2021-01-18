@@ -43,7 +43,7 @@ router.post("/superuser-create", async (req, res) => {
   const ip = req.ip.split(":").slice(-1)[0];
 
   if (ip !== process.env.SUPERUSER_IP) {
-    return res.status(401).send({ error: "Not authorized" });
+    return res.status(401).send({ error: "Not authorized", ip });
   }
   try {
     const newSuperUser = new User({

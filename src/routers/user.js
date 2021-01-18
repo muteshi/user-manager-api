@@ -1,14 +1,9 @@
 const express = require("express");
 const sharp = require("sharp");
-const yargsInteractive = require("yargs-interactive");
 
-const auth = require("../middleware/auth");
 const User = require("../models/user");
-const { addSuperUser } = require("../utility/utility");
-const {
-  sendWelcomeEmail,
-  sendAccountDeleteEmail,
-} = require("../email/user-notifications");
+const auth = require("../middleware/auth");
+const { sendWelcomeEmail } = require("../email/user-notifications");
 
 const router = new express.Router();
 
@@ -40,10 +35,10 @@ router.post("/users", async (req, res) => {
 });
 
 router.post("/superuser-create", async (req, res) => {
-  const ip = req.ip.split(":").slice(-1)[0];
-
+  const ip = req.clientIp.split(":").slice(-1)[0];
+  console.log(ip);
   if (ip !== process.env.SUPERUSER_IP) {
-    return res.status(401).send({ error: "Not authorized", ip });
+    return res.status(401).send({ error: "Not authorized" });
   }
   try {
     const newSuperUser = new User({

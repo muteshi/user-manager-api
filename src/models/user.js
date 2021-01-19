@@ -85,7 +85,15 @@ userSchema.methods.toJSON = function () {
 
 userSchema.methods.generateUserAuthToken = async function () {
   const user = this;
-  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET);
+  const token = jwt.sign(
+    {
+      _id: user._id.toString(),
+      superuser: user.superuser,
+      role: user.role,
+      name: user.name,
+    },
+    process.env.JWT_SECRET
+  );
   user.tokens = user.tokens.concat({ token });
   await user.save();
   return token;
@@ -93,9 +101,22 @@ userSchema.methods.generateUserAuthToken = async function () {
 
 //login user with phone or email
 userSchema.statics.loginUser = async (userData) => {
-  const user = await User.findOne({
-    $or: [{ email: userData.email }, { phone: userData.phone }],
-  });
+  let username = {};
+  username["email"] = userData.email;
+  username["phone"] = userData.phone;
+
+  Object.keys(username).forEach((key) =>
+    username[key] === undefined ? delete username[key] : {}
+  );
+
+  const user = await User.findOne(username);
+
+  // const user = await User.findOne({
+  //   $or: [
+  //     { $and: [{ email: { $ne: null } }, { email: userData.email }] },
+  //     { $and: [{ phone: { $ne: null } }, { phone: userData.phone }] },
+  //   ],
+  // });
 
   if (!user) {
     throw new Error("Wrong username or password one");

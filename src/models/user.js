@@ -50,7 +50,8 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      index: { unique: true, dropDups: true },
+      unique: true,
+      required: true,
       validate(value) {
         if (!validator.isMobilePhone(value)) {
           throw new Error("Enter a valid mobile number");
@@ -63,6 +64,14 @@ const userSchema = new mongoose.Schema(
     superuser: {
       type: Boolean,
       default: false,
+    },
+    active: {
+      type: Boolean,
+      default: false,
+    },
+    approved: {
+      type: Boolean,
+      default: true,
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
@@ -91,6 +100,8 @@ userSchema.methods.generateUserAuthToken = async function () {
       superuser: user.superuser,
       role: user.role,
       name: user.name,
+      email: user.email,
+      phone: user.phone,
     },
     process.env.JWT_SECRET
   );

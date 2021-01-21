@@ -118,6 +118,7 @@ router.get("/users", auth, async (req, res) => {
 });
 
 router.patch("/users/:id/edit-account", auth, async (req, res) => {
+  console.log(req);
   const updates = Object.keys(req.body);
   let allowedUpdates;
   const userFromDb = await User.findById(req.params.id);
@@ -125,14 +126,37 @@ router.patch("/users/:id/edit-account", auth, async (req, res) => {
 
   switch (true) {
     case userFromReq.superuser:
-      allowedUpdates = ["name", "email", "password", "phone", "role", "owner"];
+      allowedUpdates = [
+        "name",
+        "email",
+        "password",
+        "phone",
+        "role",
+        "owner",
+        "approved",
+      ];
       break;
     case userFromReq._id.equals(userFromDb.owner) &&
       userFromReq.role === "admin":
-      allowedUpdates = ["name", "email", "password", "phone", "role"];
+      allowedUpdates = [
+        "name",
+        "email",
+        "password",
+        "phone",
+        "role",
+        "owner",
+        "approved",
+      ];
       break;
     case userFromReq._id.equals(userFromDb._id):
-      allowedUpdates = ["name", "email", "password", "phone"];
+      allowedUpdates = [
+        "name",
+        "email",
+        "password",
+        "phone",
+        "role",
+        "approved",
+      ];
       break;
     default:
       return res.status(404).send();
@@ -180,14 +204,14 @@ router.delete("/users/:id/delete-account", auth, async (req, res) => {
 router.post(
   "/users/profile/photo",
   auth,
-  upload.single("profile-photo"),
+  upload.single("profilePhoto"),
   async (req, res) => {
     const buffer = await sharp(req.file.buffer)
       .resize({ width: 250, height: 250 })
       .png()
       .toBuffer();
 
-    req.user.avatar = buffer;
+    req.user.profile_photo = buffer;
     await req.user.save();
     res.send();
   },
@@ -198,7 +222,7 @@ router.post(
 
 router.delete("/users/profile/delete-profile-photo", auth, async (req, res) => {
   try {
-    req.user.avatar = undefined;
+    req.user.profile_photo = undefined;
     await req.user.save();
     res.send();
   } catch (error) {
@@ -210,12 +234,12 @@ router.get("/users/:id/profile-photo", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
 
-    if (!user || !user.avatar) {
+    if (!user || !user.profile_photo) {
       throw new Error();
     }
 
     res.set("Content-Type", "image/png");
-    res.send(user.avatar);
+    res.send(user.profile_photo);
   } catch (error) {
     res.status(404).send();
   }

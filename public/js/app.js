@@ -41,14 +41,13 @@ userForm.addEventListener("submit", (e) => {
   postData("/superuser-create", userData).then((data) => {
     if (data.error) {
       msgTwo.textContent = data.error;
-      console.log(data);
+
       return;
     }
     if (data.newSuperUser) {
       msgZero.textContent = "Your created details are..";
       msgOne.textContent = data.newSuperUser.name;
       msgTwo.textContent = data.newSuperUser.email;
-      console.log(data);
     }
   });
 });

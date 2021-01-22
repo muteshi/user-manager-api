@@ -20,12 +20,12 @@ hbs.registerPartials(partialsPath);
 
 userApp.use(express.static(publicDirPath));
 
-// userApp.get("/superuser", (req, res) => {
-//   res.render("index", {
-//     title: "Administration page",
-//     name: "Muteshi",
-//   });
-// });
+userApp.get("/superuser", (req, res) => {
+  res.render("index", {
+    title: "Administration page",
+    name: "Muteshi",
+  });
+});
 
 // userApp.get("*", (req, res) => {
 //   res.render("404-page", {
